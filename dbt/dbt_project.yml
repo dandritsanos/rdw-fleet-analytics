@@ -1,0 +1,21 @@
+name: 'rdw_fleet'
+version: '2.0.0'
+profile: 'rdw_fleet'
+
+model-paths:    ['models']
+seed-paths:     ['seeds']
+test-paths:     ['tests']
+macro-paths:    ['macros']
+snapshot-paths: ['snapshots']
+
+models:
+  rdw_fleet:
+    staging:
+      +materialized: view
+      +schema: staging
+    intermediate:
+      +materialized: table
+      +schema: intermediate
+    marts:
+      +materialized: table
+      +schema: marts
