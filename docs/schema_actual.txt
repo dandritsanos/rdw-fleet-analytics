@@ -1,70 +1,90 @@
 
 ======================================================================
-vehicles (m9d7-ebf2) - 49 columns
-----------------------------------------------------------------------
- aantal_wielen                                    6
- aerodyn_voorz                                    N
- afstand_hart_koppeling_tot_achterzijde_voertuig  1200
- api_gekentekende_voertuigen_assen                https://opendata.rdw.nl/resource/3huj-srit.j
- api_gekentekende_voertuigen_brandstof            https://opendata.rdw.nl/resource/8ys7-d773.j
- api_gekentekende_voertuigen_carrosserie          https://opendata.rdw.nl/resource/vezc-m2t6.j
- api_gekentekende_voertuigen_carrosserie_specifiek https://opendata.rdw.nl/resource/jhie-znh9.j
- api_gekentekende_voertuigen_voertuigklasse       https://opendata.rdw.nl/resource/kmfi-hrps.j
- breedte                                          255
- code_toelichting_tellerstandoordeel              NG
- datum_eerste_tenaamstelling_in_nederland         20220303
- datum_eerste_tenaamstelling_in_nederland_dt      2022-03-03T00:00:00.000
- datum_eerste_toelating                           20220303
- datum_eerste_toelating_dt                        2022-03-03T00:00:00.000
- datum_tenaamstelling                             20220303
- datum_tenaamstelling_dt                          2022-03-03T00:00:00.000
- eerste_kleur                                     N.v.t.
- europese_voertuigcategorie                       O4
- export_indicator                                 Nee
- handelsbenaming                                  N/A
- hoogte_voertuig                                  400
- inrichting                                       huifopbouw
- kenteken                                         OT26FS
- laadvermogen                                     34863
- lengte                                           1386
- massa_ledig_voertuig                             6137
- maximale_constructiesnelheid                     100
- maximum_last_onder_de_vooras_sen_tezamen_koppeling 14000
- merk                                             KRONE
- openstaande_terugroepactie_indicator             Nee
- registratie_datum_goedkeuring_afschrijvingsmoment_bpm 20220302
- registratie_datum_goedkeuring_afschrijvingsmoment_bpm_dt 2022-03-02T00:00:00.000
- taxi_indicator                                   Nee
- technische_max_massa_voertuig                    41000
- tellerstandoordeel                               Niet geregistreerd
- tenaamstellen_mogelijk                           Ja
- toegestane_maximum_massa_voertuig                41000
- tweede_kleur                                     N.v.t.
- type                                             SD
- typegoedkeuringsnummer                           e1*2007/46*0232*20
- uitvoering                                       1427XBJ0
- variant                                          DA06CLNF
- vervaldatum_apk                                  20270602
- vervaldatum_apk_dt                               2027-06-02T00:00:00.000
- voertuigsoort                                    Oplegger
- volgnummer_wijziging_eu_typegoedkeuring          0
- wacht_op_keuren                                  Geen verstrekking in Open Data
- wam_verzekerd                                    N.v.t.
- wielbasis                                        894
+vehicles (m9d7-ebf2) - 64 columns across 50 rows
+======================================================================
+  aantal_cilinders                                     4
+  aantal_deuren                                        4
+  aantal_rolstoelplaatsen                              0
+  aantal_wielen                                        4
+  aantal_zitplaatsen                                   5
+  afstand_hart_koppeling_tot_achterzijde_voertuig      0
+  afstand_voorzijde_voertuig_tot_hart_koppeling        0
+  api_gekentekende_voertuigen_assen                    https://opendata.rdw.nl/resource/3huj-srit.j
+  api_gekentekende_voertuigen_brandstof                https://opendata.rdw.nl/resource/8ys7-d773.j
+  api_gekentekende_voertuigen_carrosserie              https://opendata.rdw.nl/resource/vezc-m2t6.j
+  api_gekentekende_voertuigen_carrosserie_specifiek    https://opendata.rdw.nl/resource/jhie-znh9.j
+  api_gekentekende_voertuigen_voertuigklasse           https://opendata.rdw.nl/resource/kmfi-hrps.j
+  breedte                                              179
+  bruto_bpm                                            2925
+  catalogusprijs                                       42262
+  cilinderinhoud                                       1798
+  code_toelichting_tellerstandoordeel                  00
+  datum_eerste_tenaamstelling_in_nederland             20250115
+  datum_eerste_tenaamstelling_in_nederland_dt          2025-01-15T00:00:00.000
+  datum_eerste_toelating                               20250115
+  datum_eerste_toelating_dt                            2025-01-15T00:00:00.000
+  datum_tenaamstelling                                 20250115
+  datum_tenaamstelling_dt                              2025-01-15T00:00:00.000
+  eerste_kleur                                         WIT
+  europese_voertuigcategorie                           M1
+  export_indicator                                     Nee
+  handelsbenaming                                      TOYOTA COROLLA
+  hoogte_voertuig                                      146
+  inrichting                                           stationwagen
+  jaar_laatste_registratie_tellerstand                 2025
+  kenteken                                             GZS78Z
+  lengte                                               465
+  massa_ledig_voertuig                                 1375
+  massa_rijklaar                                       1475
+  maximale_constructiesnelheid                         180
+  maximum_last_onder_de_vooras_sen_tezamen_koppeling   0
+  maximum_massa_samenstelling                          2635
+  maximum_massa_trekken_ongeremd                       450
+  maximum_trekken_massa_geremd                         750
+  merk                                                 TOYOTA
+  openstaande_terugroepactie_indicator                 Nee
+  plaats_chassisnummer                                 r. binnenzyde balk achteraan
+  registratie_datum_goedkeuring_afschrijvingsmoment_bpm 20241227
+  registratie_datum_goedkeuring_afschrijvingsmoment_bpm_dt 2024-12-27T00:00:00.000
+  taxi_indicator                                       Nee
+  technische_max_massa_voertuig                        1885
+  tellerstandoordeel                                   Logisch
+  tenaamstellen_mogelijk                               Ja
+  toegestane_maximum_massa_voertuig                    1885
+  tweede_kleur                                         Niet geregistreerd
+  type                                                 ZE1HE(EU,M)
+  type_gasinstallatie                                  Af-fabriek gasinstallatie
+  typegoedkeuringsnummer                               e6*2007/46*0318*09
+  uitvoering                                           ZWE219L-DWXSBW(1K)
+  variant                                              ZWE219(W)
+  vermogen_massarijklaar                               0.05
+  vervaldatum_apk                                      20290115
+  vervaldatum_apk_dt                                   2029-01-15T00:00:00.000
+  voertuigsoort                                        Personenauto
+  volgnummer_wijziging_eu_typegoedkeuring              0
+  wacht_op_keuren                                      Geen verstrekking in Open Data
+  wam_verzekerd                                        Ja
+  wielbasis                                            270
+  zuinigheidsclassificatie                             A
 
 ======================================================================
-fuel (8ys7-d773) - 5 columns
-----------------------------------------------------------------------
- brandstof_omschrijving                           Benzine
- brandstof_volgnummer                             1
- emissiecode_omschrijving                         0
- kenteken                                         0001TJ
- uitlaatemissieniveau                             EURO 0
+fuel (8ys7-d773) - 10 columns across 50 rows
+======================================================================
+  actieradius                                          0
+  actieradius_extern_oplaadbaar                        0
+  brandstof_omschrijving                               Benzine
+  brandstof_volgnummer                                 1
+  co2_emissieklasse                                    1
+  emissiecode_omschrijving                             0
+  kenteken                                             0001TJ
+  nettomaximumvermogen                                 37.00
+  opgegeven_maximum_snelheid                           25.00
+  uitlaatemissieniveau                                 EURO 0
 
 ======================================================================
-body (vezc-m2t6) - 4 columns
-----------------------------------------------------------------------
- carrosserie_volgnummer                           1
- carrosserietype                                  DC
- kenteken                                         0001WL
- type_carrosserie_europese_omschrijving           Middenasaanhangwagen
+body (vezc-m2t6) - 4 columns across 50 rows
+======================================================================
+  carrosserie_volgnummer                               1
+  carrosserietype                                      DC
+  kenteken                                             0001WL
+  type_carrosserie_europese_omschrijving               Middenasaanhangwagen

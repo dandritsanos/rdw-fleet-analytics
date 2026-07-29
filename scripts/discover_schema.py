@@ -15,15 +15,16 @@ if os.getenv("RDW_APP_TOKEN"):
 
 for name, ds_id in DATASETS.items():
     r = requests.get(
-        f"https://opendata.rdw.nl/resource/{ds_id}.json",
-        params={"$limit": 1, "$order": ":id"},
-        headers=headers,
-        timeout=60
+    f"https://opendata.rdw.nl/resource/{ds_id}.json",
+        params={"$limit": 50, "$order": ":id",
+                **({"$where": "voertuigsoort = 'Personenauto'"} if name == "vehicles" else {})},
+        headers=headers, timeout=60,
     )
-
-    r.raise_for_status()
     rows = r.json()
-    print(f"\n{'=' * 70}\n{name} ({ds_id}) - {len(rows[0]) if rows else 0} columns\n{'-' * 70}")
-    for col, val in sorted(rows[0].items()):
-        sample = str(val)[:44]
-        print(f" {col:<48} {sample}")
+    all_cols = {}
+    for row in rows:
+        for col, val in row.items():
+            all_cols.setdefault(col, str(val)[:44])
+    print(f"\n{'='*70}\n{name} ({ds_id}) - {len(all_cols)} columns across {len(rows)} rows\n{'='*70}")
+    for col, val in sorted(all_cols.items()):
+        print(f"  {col:<52} {val}")
