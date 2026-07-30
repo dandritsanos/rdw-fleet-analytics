@@ -72,6 +72,28 @@ def _paginate(session: requests.Session, ds_id: str, where: str | None = None,
     return out
 
 
+import os
+from datetime import datetime, timezone
+
+import duckdb
+import pandas as pd
+
+DB_PATH = "dbt/data/rdw.duckdb"
+
+
+def _land(con: duckdb.DuckDBPyConnection, table: str, rows: list[dict], extracted_at: datetime) -> int:
+    """Write rows into the raw schema, as strings, unmodified."""
+    if not rows:
+        log.info("raw.%s: nothing to land", table)
+        return 0
+    df = pd.DataFrame(rows).astype("string")
+    df["_extracted_at"] = extracted_at
+    con.register("incoming", df)
+    con.execute(f"create or replace table raw.{table} as select * from incoming")
+    con.unregister("incoming")
+    n = con.execute(f"select count(*) from raw.{table}").fetchone()[0]
+    log.info("raw.%s: %s rows landed", table, f"{n:,}")
+    return n
 
 
 
@@ -79,7 +101,9 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     s = _session()
     rows = _paginate(s, VEHICLES, where="voertuigsoort = 'Personenauto'", max_rows=5000)
-    print(f"\nFetched {len(rows)} rows")
-    plates = [r["kenteken"] for r in rows]
-    print(f"Unique plates: {len(set(plates))}")
-    print("Sample row:", rows[0])
+
+    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+    con = duckdb.connect(DB_PATH)
+    con.execute("create schema if not exists raw")
+    _land(con, "vehicles", rows, datetime.now(timezone.utc))
+    con.close()
