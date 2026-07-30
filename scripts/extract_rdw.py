@@ -40,17 +40,14 @@ def _get(session: requests.Session, ds_id: str, params: dict, tries: int = 5) ->
             )
             time.sleep(wait)
             continue
-
-        # any other status (including a real 4xx, or success) is final -
-        # do not retry, let it raise or return immediately
+        
         resp.raise_for_status()
         return resp.json()
 
     return []
 
 
-def _paginate(session: requests.Session, ds_id: str, where: str | None = None,
-               max_rows: int = 5000, page_size: int = 5000) -> list[dict]:
+def _paginate(session: requests.Session, ds_id: str, where: str | None = None, max_rows: int = 5000, page_size: int = 5000) -> list[dict]:
     out: list[dict] = []
     offset = 0
     while len(out) < max_rows:
