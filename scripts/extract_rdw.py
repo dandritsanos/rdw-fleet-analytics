@@ -104,13 +104,42 @@ def _land(
     return n
 
 
+FUEL = "8ys7-d773"
+BODY = "vezc-m2t6"
+PLATE_BATCH = 400   # plates per IN() lookup - keeps URLs under length limits
+
+
+def _fetch_by_plates(session: requests.Session, ds_id: str, plates: list[str]) -> list[dict]:
+    """Fetch satellite rows only for the plates we actually landed.
+
+    The fuel and body datasets cover the entire national fleet. Rather
+    than downloading millions of rows to use a few thousand, this asks
+    the API for rows matching our specific plates via a SoQL IN() filter,
+    batched at 400 plates per request to stay under URL length limits.
+    """
+    rows: list[dict] = []
+    for i in range(0, len(plates), PLATE_BATCH):
+        batch = plates[i:i + PLATE_BATCH]
+        quoted = ",".join(f"'{p}'" for p in batch)
+        rows.extend(
+            _paginate(session, ds_id,
+                      where=f"kenteken in({quoted})",
+                      max_rows=len(batch) * 5)   # generous ceiling; hybrids have 2+ fuel rows
+        )
+        log.info("%s: %s/%s plates looked up", ds_id, min(i + PLATE_BATCH, len(plates)), len(plates))
+    return rows
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     s = _session()
-    rows = _paginate(s, VEHICLES, where="voertuigsoort = 'Personenauto'", max_rows=5000)
+    rows = _paginate(s, VEHICLES, where="voertuigsoort = 'Personenauto'", max_rows=1000)
+    plates = sorted({r["kenteken"] for r in rows if r.get("kenteken")})
+    print(f"Vehicles: {len(rows)}, distinct plates: {len(plates)}")
 
-    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-    con = duckdb.connect(DB_PATH)
-    con.execute("create schema if not exists raw")
-    _land(con, "vehicles", rows, datetime.now(timezone.utc))
-    con.close()
+    fuel = _fetch_by_plates(s, FUEL, plates)
+    body = _fetch_by_plates(s, BODY, plates)
+    print(f"Fuel rows: {len(fuel)}  (expect >= {len(plates)}, hybrids have 2+)")
+    print(f"Body rows: {len(body)}")
+
+    fuel_plates = {r["kenteken"] for r in fuel}
+    print(f"Plates with no fuel record: {len(set(plates) - fuel_plates)}")
