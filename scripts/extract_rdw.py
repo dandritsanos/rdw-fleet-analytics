@@ -129,17 +129,24 @@ def _fetch_by_plates(session: requests.Session, ds_id: str, plates: list[str]) -
         log.info("%s: %s/%s plates looked up", ds_id, min(i + PLATE_BATCH, len(plates)), len(plates))
     return rows
 
+def _get_watermark(con: duckdb.DuckDBPyConnection) -> str | None:
+    """Newest registration date already landed. None on a cold start.
+
+    Used to build an incremental $where filter so reruns only fetch rows
+    newer than what we already have. Known limitation, accepted for this
+    project: a watermark cannot detect deletions (e.g. an exported
+    vehicle leaving the register) - that requires CDC or a full diff.
+    """
+    try:
+        return con.execute(
+            "select max(datum_tenaamstelling) from raw.vehicles"
+        ).fetchone()[0]
+    except duckdb.Error:
+        return None   # table doesn't exist yet - cold start
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
-    s = _session()
-    rows = _paginate(s, VEHICLES, where="voertuigsoort = 'Personenauto'", max_rows=1000)
-    plates = sorted({r["kenteken"] for r in rows if r.get("kenteken")})
-    print(f"Vehicles: {len(rows)}, distinct plates: {len(plates)}")
-
-    fuel = _fetch_by_plates(s, FUEL, plates)
-    body = _fetch_by_plates(s, BODY, plates)
-    print(f"Fuel rows: {len(fuel)}  (expect >= {len(plates)}, hybrids have 2+)")
-    print(f"Body rows: {len(body)}")
-
-    fuel_plates = {r["kenteken"] for r in fuel}
-    print(f"Plates with no fuel record: {len(set(plates) - fuel_plates)}")
+    con = duckdb.connect(DB_PATH)
+    wm = _get_watermark(con)
+    print(f"Current watermark: {wm}")
+    con.close()
