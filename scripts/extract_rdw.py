@@ -144,9 +144,47 @@ def _get_watermark(con: duckdb.DuckDBPyConnection) -> str | None:
     except duckdb.Error:
         return None   # table doesn't exist yet - cold start
 
+MAX_ROWS = int(os.getenv("RDW_MAX_ROWS", "300000"))
+MIN_ADMISSION_YEAR = os.getenv("RDW_MIN_ADMISSION_YEAR", "2010")
+
+
+def run_extract() -> dict[str, int]:
+    """Full extract: vehicles (bounded, watermarked) then satellites by plate."""
+    extracted_at = datetime.now(timezone.utc)
+    session = _session()
+    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+    con = duckdb.connect(DB_PATH)
+    con.execute("create schema if not exists raw")
+
+    where = (
+        f"datum_eerste_toelating >= '{MIN_ADMISSION_YEAR}0101'"
+        " AND voertuigsoort = 'Personenauto'"
+    )
+    watermark = _get_watermark(con)
+    if watermark:
+        where += f" AND datum_tenaamstelling > '{watermark}'"
+        log.info("incremental run from watermark %s", watermark)
+    else:
+        log.info("cold start - full bounded load")
+
+    vehicles = _paginate(session, VEHICLES, where=where, max_rows=MAX_ROWS)
+    if not vehicles:
+        log.info("no new vehicles; nothing to do")
+        con.close()
+        return {"vehicles": 0, "fuel": 0, "body": 0}
+
+    plates = sorted({r["kenteken"] for r in vehicles if r.get("kenteken")})
+    log.info("fetching satellites for %s plates", f"{len(plates):,}")
+
+    counts = {
+        "vehicles": _land(con, "vehicles", vehicles, extracted_at),
+        "fuel":     _land(con, "fuel", _fetch_by_plates(session, FUEL, plates), extracted_at),
+        "body":     _land(con, "body", _fetch_by_plates(session, BODY, plates), extracted_at),
+    }
+    con.close()
+    return counts
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
-    con = duckdb.connect(DB_PATH)
-    wm = _get_watermark(con)
-    print(f"Current watermark: {wm}")
-    con.close()
+    print(run_extract())
