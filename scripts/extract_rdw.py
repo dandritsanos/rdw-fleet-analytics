@@ -161,6 +161,7 @@ def run_extract() -> dict[str, int]:
         " AND voertuigsoort = 'Personenauto'"
     )
     watermark = _get_watermark(con)
+    print(f"DEBUG: watermark = {watermark!r}, DB_PATH = {DB_PATH!r}")
     if watermark:
         where += f" AND datum_tenaamstelling > '{watermark}'"
         log.info("incremental run from watermark %s", watermark)
