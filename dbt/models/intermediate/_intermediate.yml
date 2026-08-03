@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: int_fuel_by_vehicle
+    description: >
+      Fuel data collapsed from one row per (licence_plate, fuel_sequence)
+      to one row per licence_plate, with a derived powertrain
+      classification. Fixes the fan-out present in stg_fuel (~19.8% of
+      vehicles have 2+ fuel rows; some, like PB069L, have 3).
+    columns:
+      - name: licence_plate
+        description: One row per vehicle - this is the proof the fan-out is resolved.
+        tests: [unique, not_null]
+      - name: powertrain_class
+        tests:
+          - accepted_values:
+              values: ['BEV', 'Hybrid / PHEV', 'FCEV', 'ICE', 'Unknown']
