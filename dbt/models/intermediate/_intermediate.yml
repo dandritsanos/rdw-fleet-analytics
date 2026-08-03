@@ -15,3 +15,13 @@ models:
         tests:
           - accepted_values:
               values: ['BEV', 'Hybrid / PHEV', 'FCEV', 'ICE', 'Unknown']
+
+  - name: int_vehicle_enriched
+    description: Vehicles joined to fuel (vehicle-grain) and primary body record.
+    columns:
+      - name: licence_plate
+        tests: [unique, not_null]
+      - name: powertrain_class
+        tests:
+          - accepted_values:
+              values: ['BEV', 'Hybrid / PHEV', 'FCEV', 'ICE', 'Unknown']
