@@ -1,0 +1,12 @@
+version: 2
+
+snapshots:
+  - name: snap_vehicle_state
+    description: >
+      SCD Type 2 on vehicle registration, APK, insurance and export
+      status. Check strategy against four tracked columns.
+    columns:
+      - name: licence_plate
+        tests: [not_null]
+      - name: dbt_valid_from
+        tests: [not_null]
