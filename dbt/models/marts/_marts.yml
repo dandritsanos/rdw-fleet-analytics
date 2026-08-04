@@ -16,4 +16,35 @@ models:
         tests:
           - accepted_values:
               values: ['volume', 'mainstream', 'niche', 'marginal']
-              
+
+  - name: fct_vehicle_registration
+    description: >
+      Central fact table. Grain: one row per registered vehicle
+      (licence_plate). Incrementally materialised on _extracted_at.
+    columns:
+      - name: vehicle_sk
+        tests: [unique, not_null]
+      - name: licence_plate
+        tests: [unique, not_null]
+      - name: powertrain_class
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['BEV', 'Hybrid / PHEV', 'FCEV', 'ICE', 'Unknown']
+      - name: nl_registration_year
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1900
+              max_value: 2100
+
+  - name: mart_fleet_electrification
+    description: Powertrain mix by NL registration year, with shares and YoY deltas.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [registration_year, powertrain_class]
+    columns:
+      - name: share_of_year_pct
+        tests:
+          - not_null
+          - dbt_utils.accepted_range: {min_value: 0, max_value: 100}
