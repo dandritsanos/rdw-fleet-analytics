@@ -5,7 +5,7 @@ passenger car fleet, built on open data from the RDW (Netherlands Vehicle
 Authority).
 
 **Status: in active development.** Extraction, modelling, testing, and
-validation are complete; orchestration (Airflow) and CI are in progress.
+validation are complete while orchestration (Airflow) and CI are in progress.
 
 ---
 
@@ -14,8 +14,8 @@ validation are complete; orchestration (Airflow) and CI are in progress.
 Extracts vehicle, fuel, and body data from the RDW Open Data API
 (Socrata), lands it raw in DuckDB, transforms it through a layered dbt
 project into a star schema, tracks vehicle state changes over time with
-SCD Type 2 snapshots, and validates the headline output — BEV share of
-registrations by year — against nationally published figures.
+SCD Type 2 snapshots, and validates the headline output (BEV share of
+registrations by year) against nationally published figures.
 
 **Headline finding:** BEV share of first-time passenger car registrations
 in this dataset rises from 0.75% (2015) to 13.88% (2020) to 17.33%
@@ -30,17 +30,17 @@ reported electrification trend.
 flowchart TD
     API["RDW Open Data API<br/>(Socrata)"]
 
-    EXTRACT["scripts/extract_rdw.py<br/>─────────────<br/>app-token auth · retry with backoff (429/5xx only)<br/>stable pagination ($order=:id)<br/>batched satellite lookups by plate<br/>watermark-based incremental extraction"]
+    EXTRACT["scripts/extract_rdw.py<br/>─────────────<br/>app-token auth · retry with backoff (429/5xx only)<br/>stable pagination <br/>batched satellite lookups by plate<br/>watermark-based incremental extraction"]
 
     RAW[("DuckDB · raw schema — Bronze<br/>─────────────<br/>raw.vehicles · raw.fuel · raw.body<br/>all columns as strings, verbatim")]
 
-    STG["staging — Silver (views)<br/>─────────────<br/>stg_vehicles · stg_fuel · stg_body<br/>typed, renamed, lightly filtered"]
+    STG["staging — Silver (views)<br/>─────────────<br/>stg_vehicles · stg_fuel · stg_body typed, renamed, lightly filtered"]
 
     INT["intermediate (tables)<br/>─────────────<br/>int_fuel_by_vehicle — fan-out collapsed,<br/>powertrain classification derived<br/>int_vehicle_enriched — joins + derived flags"]
 
     MARTS["marts — Gold (tables)<br/>─────────────<br/>dim_brand — one row per brand<br/>fct_vehicle_registration — incremental fact<br/>mart_fleet_electrification — KPI mart"]
 
-    SNAP["snapshots<br/>─────────────<br/>snap_vehicle_state — SCD Type 2 on<br/>registration, APK, insurance, export status"]
+    SNAP["snapshots<br/>─────────────<br/> SCD Type 2 on registration, APK, insurance, export status"]
 
     API --> EXTRACT --> RAW
     RAW -->|dbt| STG --> INT --> MARTS
@@ -52,7 +52,7 @@ flowchart TD
 | Component | Choice | Why |
 |---|---|---|
 | Extraction | Python (requests) | Retry, pagination, and batching logic under direct control |
-| Storage/compute | DuckDB | Zero-infrastructure columnar engine; the whole warehouse is one file |
+| Storage/compute | DuckDB | Zero-infrastructure columnar engine, the whole warehouse is one file |
 | Transformation | dbt Core | Layered models, testing, lineage, snapshots |
 | Testing | dbt tests + dbt_utils | Grain assertions, accepted values, singular tests |
 
@@ -75,7 +75,7 @@ flowchart TD
 ## Engineering notes
 
 **The fan-out problem.** The fuel dataset has one row per fuel type per
-vehicle — 19.8% of vehicles have two or more (hybrids; some have three,
+vehicle, 19.8% of vehicles have two or more (some have three,
 e.g. a hybrid with an LPG conversion). A naive join inflates 300,000
 vehicles into 359,438 rows, silently corrupting every downstream
 aggregate. Resolved by collapsing fuel to vehicle grain in a dedicated
@@ -86,19 +86,19 @@ fuel-type row counts (FCEV count matches hydrogen fuel rows exactly).
 
 **Incremental loading, twice.** The extract script uses a watermark
 (max registration date already landed) so reruns only fetch new rows.
-The fact table applies the same concept inside dbt — `is_incremental()`
+The fact table applies the same concept inside dbt with `is_incremental()`
 filtering on `_extracted_at`, with delete+insert on a surrogate key.
-Both verified idempotent: rerunning with no new data changes nothing.
+Both verified idempotent, rerunning with no new data changes nothing.
 
 **SCD Type 2.** Vehicle state (registration date, APK expiry, insurance,
-export status) is tracked over time with a dbt snapshot (check strategy —
+export status) is tracked over time with a dbt snapshot (
 the source has no reliable `updated_at`). Verified end to end: manually
 updating one vehicle's APK date and re-snapshotting produced a correctly
 closed old row and a new open row with exactly matching transition
 timestamps — a gapless `[valid_from, valid_to)` interval.
 
 **Schema discovery vs. reality.** A 50-row discovery sample found only
-10 of the fuel dataset's 32 real columns — RDW populates different
+10 of the fuel dataset's 32 real columns. RDW populates different
 fields per powertrain, and Socrata omits null fields from JSON entirely.
 Staging models are verified against `describe` on landed data, not
 discovery samples.
@@ -142,17 +142,17 @@ trend shape fully consistent throughout.
 
 35 data tests across all layers, including:
 
-- **Grain assertions** — `unique`/`not_null` on every model's key;
+- **Grain assertions**: `unique`/`not_null` on every model's key;
   `unique_combination_of_columns` on composite grains (fuel staging,
   electrification mart)
-- **Semantic invariants** — a singular test asserting every year's
+- **Semantic invariants**: a singular test asserting every year's
   powertrain shares sum to 100%
-- **Value constraints** — `accepted_values` on powertrain class and fuel
+- **Value constraints**: `accepted_values` on powertrain class and fuel
   type; `accepted_range` on percentages
-- **Severity tiers** — expected register noise (154 of 300,000 vehicles
+- **Severity tiers**: expected register noise (154 of 300,000 vehicles
   lack a registration date) warns without blocking; genuine invariant
   violations error
-- **Source freshness** — `_extracted_at` monitored against warn/error
+- **Source freshness**: `_extracted_at` monitored against warn/error
   thresholds
 
 ---
