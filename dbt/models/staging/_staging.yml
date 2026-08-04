@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: stg_vehicles
+    description: Typed and renamed vehicle register. One row per licence plate.
+    columns:
+      - name: licence_plate
+        tests: [unique, not_null]
+      - name: first_nl_registration_date
+        tests:
+          - not_null:
+              config:
+                severity: warn
+
+  - name: stg_fuel
+    description: >
+      GRAIN: one row per (licence_plate, fuel_sequence). Hybrids and
+      multi-fuel vehicles appear more than once by design.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [licence_plate, fuel_sequence]
+    columns:
+      - name: licence_plate
+        tests: [not_null]
+      - name: fuel_type
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Benzine', 'Diesel', 'Elektriciteit', 'Lpg', 'Cng', 'Alcohol', 'Waterstof']
+              config:
+                severity: warn
+
+  - name: stg_body
+    columns:
+      - name: licence_plate
+        tests: [not_null]
