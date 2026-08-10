@@ -157,4 +157,13 @@ trend shape fully consistent throughout.
 
 ---
 
+
+## Orchestration setup (in progress)
+
+Local Airflow running via Astro CLI (astronomer/astro-cli) + Docker
+Desktop, in a separate project (`rdw-airflow/`). DAG connecting
+extract -> snapshot -> dbt build -> source freshness in progress.
+
+
+
 ## Repository structure
