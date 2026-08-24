@@ -12,11 +12,11 @@ def test_dbt_connection():
 
     @task.bash
     def check_dbt_version():
-        return "cd /usr/local/airflow/rdw_project/dbt && dbt --version"
+        return "cd /usr/local/airflow/rdw_project/dbt && /usr/local/airflow/dbt_venv/bin/dbt --version"
 
     @task.bash
     def check_project_files():
-        return "ls -la /usr/local/airflow/rdw_project/scripts/"
+        return "ls /usr/local/airflow/rdw_project/dbt/models"
 
     check_dbt_version() >> check_project_files()
 

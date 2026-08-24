@@ -2,6 +2,3 @@ services:
   scheduler:
     volumes:
       - /Users/dandritsanos/Desktop/Project-Summer/dutch-rail-reliability-pipeline:/usr/local/airflow/rdw_project:cached
-  api-server:
-    volumes:
-      - /Users/dandritsanos/Desktop/Project-Summer/dutch-rail-reliability-pipeline:/usr/local/airflow/rdw_project:cached
