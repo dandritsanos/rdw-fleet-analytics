@@ -4,9 +4,6 @@ An end-to-end ELT pipeline analysing the electrification of the Dutch
 passenger car fleet, built on open data from the RDW (Netherlands Vehicle
 Authority).
 
-**Status: in active development.** Extraction, modelling, testing, and
-validation are complete while orchestration (Airflow) and CI are in progress.
-
 ---
 
 ## What this project does
@@ -175,5 +172,25 @@ Daily pipeline orchestrated with Apache Airflow (Astro CLI + Docker):
 GitHub Actions (`.github/workflows/dbt_ci.yml`) runs `dbt compile` on every PR touching `dbt/`. Validates all SQL compiles before merge.
 
 
-
 ## Repository structure
+
+```
+dutch-rail-reliability-pipeline/
+├── scripts/
+│   └── extract_rdw.py          # Extraction: retry, pagination, watermark
+├── dbt/
+│   ├── models/
+│   │   ├── staging/            # Bronze → Silver (views)
+│   │   ├── intermediate/       # Fan-out fix, enrichment
+│   │   └── marts/              # dim_brand, fct_vehicle_registration, mart_fleet_electrification
+│   ├── snapshots/              # SCD Type 2 — vehicle state
+│   ├── tests/                  # Singular tests
+│   └── docs/                   # Data dictionary
+├── airflow/
+│   ├── dags/
+│   │   └── rdw_pipeline.py     # Production DAG
+│   └── Dockerfile              # dbt venv isolation
+└── .github/
+    └── workflows/
+        └── dbt_ci.yml          # dbt compile on every PR
+```
