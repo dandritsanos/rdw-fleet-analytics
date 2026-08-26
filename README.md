@@ -55,6 +55,8 @@ flowchart TD
 | Storage/compute | DuckDB | Zero-infrastructure columnar engine, the whole warehouse is one file |
 | Transformation | dbt Core | Layered models, testing, lineage, snapshots |
 | Testing | dbt tests + dbt_utils | Grain assertions, accepted values, singular tests |
+| Orchestration | Apache Airflow (Astro CLI) | Daily schedule, retries, task dependencies |
+| CI | GitHub Actions | dbt compile on every PR to main |
 
 ---
 
@@ -158,11 +160,19 @@ trend shape fully consistent throughout.
 ---
 
 
-## Orchestration setup (in progress)
+## Orchestration
 
-Local Airflow running via Astro CLI (astronomer/astro-cli) + Docker
-Desktop, in a separate project (`rdw-airflow/`). DAG connecting
-extract -> snapshot -> dbt build -> source freshness in progress.
+Daily pipeline orchestrated with Apache Airflow (Astro CLI + Docker):
+
+`dbt deps → dbt snapshot → dbt run → dbt test → dbt source freshness`
+
+- Schedule: `0 6 * * *`, `catchup=False`, `max_active_runs=1`, 2 retries
+- dbt runs in an isolated virtualenv to resolve a protobuf conflict between Airflow's OpenTelemetry dependencies and dbt-core
+- Source freshness gates the pipeline — errors if raw data is >168h stale
+
+## CI
+
+GitHub Actions (`.github/workflows/dbt_ci.yml`) runs `dbt compile` on every PR touching `dbt/`. Validates all SQL compiles before merge.
 
 
 
