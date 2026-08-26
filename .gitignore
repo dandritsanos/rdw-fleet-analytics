@@ -11,3 +11,5 @@ logs/
 airflow/.astro/
 airflow/logs/
 airflow/.env
+dbt/profiles.yml
+dbt/dbt_packages/
