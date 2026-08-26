@@ -1,5 +1,4 @@
 name: dbt CI
-
 on:
   pull_request:
     branches: [main]
