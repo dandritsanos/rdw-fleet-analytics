@@ -177,20 +177,20 @@ GitHub Actions (`.github/workflows/dbt_ci.yml`) runs `dbt compile` on every PR t
 ```
 dutch-rail-reliability-pipeline/
 ├── scripts/
-│   └── extract_rdw.py          # Extraction: retry, pagination, watermark
+│   └── extract_rdw.py          
 ├── dbt/
 │   ├── models/
-│   │   ├── staging/            # Bronze → Silver (views)
-│   │   ├── intermediate/       # Fan-out fix, enrichment
-│   │   └── marts/              # dim_brand, fct_vehicle_registration, mart_fleet_electrification
-│   ├── snapshots/              # SCD Type 2 — vehicle state
-│   ├── tests/                  # Singular tests
-│   └── docs/                   # Data dictionary
+│   │   ├── staging/           
+│   │   ├── intermediate/       
+│   │   └── marts/              
+│   ├── snapshots/             
+│   ├── tests/                  
+│   └── docs/                  
 ├── airflow/
 │   ├── dags/
-│   │   └── rdw_pipeline.py     # Production DAG
-│   └── Dockerfile              # dbt venv isolation
+│   │   └── rdw_pipeline.py    
+│   └── Dockerfile              
 └── .github/
     └── workflows/
-        └── dbt_ci.yml          # dbt compile on every PR
+        └── dbt_ci.yml          
 ```
